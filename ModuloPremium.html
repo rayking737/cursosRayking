@@ -1,0 +1,366 @@
+<!DOCTYPE html> 
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Carrusel 3D</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      height: 100vh;
+      background: #111;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      overflow-x: hidden;
+      font-family: sans-serif;
+    }
+
+    .navbar {
+      position: absolute;
+      top: 0;
+      width: 100%;
+      background: #222;
+      padding: 10px 0;
+      text-align: center;
+      z-index: 1000;
+    }
+
+    .navbar ul {
+      list-style: none;
+      display: flex;
+      justify-content: center;
+      gap: 30px;
+      margin: 0;
+      padding: 0;
+    }
+
+    .navbar li a {
+      color: #00f0ff;
+      text-decoration: none;
+      font-weight: bold;
+      font-size: 16px;
+      transition: color 0.3s;
+    }
+
+    .navbar li a:hover {
+      color: white;
+    }
+
+    /* CRONÓMETRO NUEVO */
+    .countdown {
+      margin-top: 70px;
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      font-size: 1.2rem;
+      color: gold;
+      z-index: 999;
+    }
+
+    .time-box {
+      background: #222;
+      padding: 10px 15px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+      text-align: center;
+    }
+
+    .time-box div {
+      font-size: 1.5rem;
+      font-weight: bold;
+    }
+
+    .time-box span {
+      display: block;
+      font-size: 0.8rem;
+      margin-top: 5px;
+      color: #aaa;
+    }
+
+    .mensaje-bienvenida {
+      margin-top: 10px;
+      width: 100%;
+      text-align: center;
+      color: #ffffff;
+      font-size: 24px;
+      font-weight: bold;
+      z-index: 1000;
+    }
+
+    .carousel-container {
+      width: 100%;
+      max-width: 800px;
+      height: 500px;
+      margin-top: -20px;
+      position: relative;
+      perspective: 10000px;
+    }
+
+    .carousel {
+      width: 100%;
+      height: 100%;
+      position: absolute;
+      transform-style: preserve-3d;
+      transition: transform 1s;
+    }
+
+    .carousel figure {
+      display: block;
+      position: absolute;
+      width: 240px;
+      height: 360px;
+      left: calc(50% - 120px);
+      top: calc(50% - 180px);
+      transition: transform 0.5s;
+      cursor: pointer;
+      width: 40vw;
+      height: 60vw;
+      max-width: 240px;
+      max-height: 360px;
+    }
+
+    .carousel figure img {
+      width: 120%;
+      height: 100%;
+      border-radius: 10px;
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.6);
+      transition: transform 0.3s ease;
+    }
+
+    .carousel figure:hover img {
+      transform: scale(1.1);
+    }
+
+    .buttons {
+      position: absolute;
+      bottom: 10px;
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .buttons button {
+      padding: 10px 20px;
+      background: #00f0ff;
+      border: none;
+      border-radius: 5px;
+      color: black;
+      cursor: pointer;
+    }
+
+    .overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0,0,0,0.8);
+      display: none;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .overlay img {
+      max-width: 90vw;
+      max-height: 90vh;
+      border-radius: 10px;
+    }
+
+    .controls {
+      position: absolute;
+      bottom: 10px;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+    }
+/* Botón de WhatsApp como burbuja flotante */
+.whatsapp-bubble {
+  position: fixed;
+  bottom: 20px;
+  left: 20px; /* Ahora empieza en el lado izquierdo */
+  background-color: #25d366;
+  color: white;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 30px;
+  text-decoration: none;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.4);
+  z-index: 10000;
+  cursor: grab;
+  user-select: none;
+  touch-action: none;
+  transition: background-color 0.3s ease;
+}
+
+.whatsapp-bubble:hover {
+  background-color: #128c7e;
+}
+
+    @media (max-width: 600px) {
+      .mensaje-bienvenida {
+        font-size: 18px;
+      }
+
+      .carousel figure {
+        width: 60vw;
+        height: 90vw;
+      }
+
+      .navbar li a {
+        font-size: 14px;
+      }
+    }
+    
+
+    .whatsapp-icon {
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.15); }
+  100% { transform: scale(1); }
+}
+  </style>
+</head>
+
+<body>
+  <nav class="navbar">
+    <ul>
+      <li><a href="inicio.html">Inicio</a></li>
+      <li><a href="ModuloPremium.html">Modulo Premium</a></li>
+      <li><a href="regalo.html">Regalo</a></li>
+    </ul>
+  </nav>
+
+  <!-- CRONÓMETRO AGREGADO -->
+  <div class="countdown">
+    <div class="time-box">
+      <div id="days">00</div>
+      <span>Días</span>
+    </div>
+    <div class="time-box">
+      <div id="hours">00</div>
+      <span>Horas</span>
+    </div>
+    <div class="time-box">
+      <div id="minutes">00</div>
+      <span>Minutos</span>
+    </div>
+    <div class="time-box">
+      <div id="seconds">00</div>
+      <span>Segundos</span>
+    </div>
+  </div>
+
+  <div class="mensaje-bienvenida">
+    observa algunos de nuestros productos <br>
+  </div>
+
+  <div class="carousel-container">
+    <div class="carousel" id="carousel">
+      <script>
+        for (let i = 1; i <= 17; i++) {
+          const angle = (360 / 17) * (i - 1);
+          document.write(`
+            <figure style="transform: rotateY(${angle}deg) translateZ(800px);">
+              <img src="imagenes/img${i}.jpg" alt="Producto ${i}" onclick="showImage('imagenes/img${i}.jpg')">
+            </figure>
+          `);
+        }
+      </script>
+    </div>
+
+    <div class="buttons">
+      <button onclick="rotate(-1)">⟨</button>
+      <button onclick="rotate(1)">⟩</button>
+    </div>
+  </div>
+
+  <div class="overlay" id="overlay" onclick="hideImage()">
+    <img id="overlayImg" src="" alt="">
+  </div>
+
+  <div class="controls">
+    <div class="buttons"></div>
+    <a href="https://wa.me/message/GPFAB5G53X3EM1" target="_blank" class="whatsapp-bubble" title="Contáctanos por WhatsApp">
+      <svg viewBox="0 0 32 32" width="30" height="30" fill="white" class="whatsapp-icon">
+        <path d="M16 0C7.163 0 0 7.163 0 16c0 2.837.742 5.511 2.031 7.844L0 32l8.406-2.188C10.771 31.257 13.308 32 16 32c8.837 0 16-7.163 16-16S24.837 0 16 0zm0 29c-2.474 0-4.854-.651-6.938-1.875l-.5-.313-5 1.313 1.313-5-.313-.5C4.651 20.854 4 18.474 4 16 4 8.832 8.832 4 16 4s12 4.832 12 12-4.832 12-12 12zm7.225-8.547c-.386-.193-2.279-1.125-2.633-1.251-.353-.125-.611-.193-.87.193s-1 1.25-1.225 1.506c-.223.256-.445.289-.83.096-.386-.193-1.631-.602-3.104-1.921-1.147-1.024-1.92-2.285-2.147-2.671-.223-.385-.024-.592.17-.785.175-.174.386-.447.578-.67.193-.223.256-.385.386-.642.125-.256.062-.482-.031-.674-.094-.193-.87-2.096-1.193-2.864-.313-.753-.633-.648-.87-.66-.223-.012-.48-.012-.738-.012-.256 0-.673.096-1.025.482s-1.344 1.312-1.344 3.203 1.377 3.713 1.568 3.971c.193.256 2.712 4.133 6.566 5.79.918.396 1.634.633 2.191.811.92.293 1.758.252 2.42.154.738-.109 2.279-.931 2.6-1.831.32-.901.32-1.672.223-1.831-.094-.154-.352-.248-.738-.441z"/>
+      </svg>
+    </a>
+    
+  </div>
+
+  <!-- SCRIPT DEL CRONÓMETRO -->
+  <script>
+    const targetDate = new Date("2025-05-31T00:00:00").getTime(); 
+
+    function updateCountdown() {
+      const now = new Date().getTime();
+      const distance = targetDate - now;
+
+      const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+      document.getElementById("days").innerText = days.toString().padStart(2, '0');
+      document.getElementById("hours").innerText = hours.toString().padStart(2, '0');
+      document.getElementById("minutes").innerText = minutes.toString().padStart(2, '0');
+      document.getElementById("seconds").innerText = seconds.toString().padStart(2, '0');
+
+      if (distance < 0) {
+        clearInterval(timer);
+        document.querySelector(".countdown").innerHTML = "<h2>¡La oferta ha terminado!</h2>";
+      }
+    }
+
+    const timer = setInterval(updateCountdown, 1000);
+
+    const carousel = document.getElementById('carousel');
+    let angle = 0;
+    const step = 360 / 17;
+    let autoRotate = setInterval(() => rotate(1), 2000);
+
+    function rotate(dir) {
+      angle += dir * step;
+      carousel.style.transform = `rotateY(${angle}deg)`;
+      resetAutoRotate();
+    }
+
+    function resetAutoRotate() {
+      clearInterval(autoRotate);
+      autoRotate = setInterval(() => rotate(1), 2000);
+    }
+
+    function showImage(src) {
+      document.getElementById('overlayImg').src = src;
+      document.getElementById('overlay').style.display = 'flex';
+    }
+
+    function hideImage() {
+      document.getElementById('overlay').style.display = 'none';
+    }
+
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "ArrowRight") rotate(1);
+      if (e.key === "ArrowLeft") rotate(-1);
+    });
+  </script>
+</body>
+</html>
